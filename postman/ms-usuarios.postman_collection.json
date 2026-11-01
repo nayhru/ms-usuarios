@@ -1,0 +1,498 @@
+{
+  "info": {
+    "name": "ms-usuarios",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Inicio de sesion",
+      "item": [
+        {
+          "name": "Login ADMIN",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"admin\",\n  \"clave\": \"Admin2026*\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const r = pm.response.json();",
+                  "pm.collectionVariables.set('tokenAdmin', r.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login USUARIO",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"camila.rojas\",\n  \"clave\": \"Usuario2026*\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const r = pm.response.json();",
+                  "pm.collectionVariables.set('tokenUsuario', r.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login con clave incorrecta (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"admin\",\n  \"clave\": \"incorrecta\"\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Usuarios",
+      "item": [
+        {
+          "name": "POST Registrar usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/usuarios",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"javiera.munoz\",\n  \"correo\": \"javiera.munoz@foro.cl\",\n  \"clave\": \"Usuario2026*\",\n  \"nombreCompleto\": \"Javiera Munoz\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const r = pm.response.json();",
+                  "pm.collectionVariables.set('idUsuario', r.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Registro invalido (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/usuarios",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"a\",\n  \"correo\": \"correo-malo\",\n  \"clave\": \"123\",\n  \"nombreCompleto\": \"\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Listar usuarios (ADMIN)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/usuarios",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Listar usuarios sin permiso (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/usuarios",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenUsuario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Listar usuarios sin token (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/usuarios",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Usuarios por rol",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/usuarios?rol=USUARIO",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Usuario por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/usuarios/{{idUsuario}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Actualizar usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/usuarios/{{idUsuario}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"javiera.m@foro.cl\",\n  \"nombreCompleto\": \"Javiera Munoz Perez\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Cambiar rol (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/usuarios/{{idUsuario}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"javiera.m@foro.cl\",\n  \"nombreCompleto\": \"Javiera Munoz Perez\",\n  \"rolId\": 2\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Eliminar usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base}}/api/usuarios/{{idUsuario}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Roles",
+      "item": [
+        {
+          "name": "GET Listar roles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/roles",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Crear rol",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/roles",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"INVITADO\",\n  \"descripcion\": \"Solo puede leer el foro\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const r = pm.response.json();",
+                  "pm.collectionVariables.set('idRol', r.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Rol por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/roles/{{idRol}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Actualizar rol",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/roles/{{idRol}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"VISITANTE\",\n  \"descripcion\": \"Lectura del foro\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Eliminar rol",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base}}/api/roles/{{idRol}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Rol con usuarios (409)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base}}/api/roles/1",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "tokenAdmin",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tokenUsuario",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idUsuario",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idRol",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
